@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+  
+  setup:
+    build: ./setup
+    volumes:
+      - ./setup:/app
+      - ./data:/app/data
+    depends_on:
+      - db
+  
+  updater:
+    build: ./updater
+    volumes:
+      - ./updater:/app
+    depends_on:
+      - db
+
+volumes:
+  db-data: {}
